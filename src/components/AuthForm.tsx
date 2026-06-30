@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
-import { Activity, Mail, Lock, User, Building2 } from 'lucide-react';
+import { Building2, Loader2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useHospitals } from '../hooks/useHospitals';
 
 interface AuthFormProps {
   onSuccess: () => void;
 }
 
 export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
+  const { hospitals, loading: loadingHospitals } = useHospitals();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleHospitalLogin = async (hospitalId: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const { error } = isLogin 
-        ? await signIn(email, password)
-        : await signUp(email, password);
+      const { error } = await signIn('', '', hospitalId);
 
       if (error) {
-        setError(error.message);
+        setError(error?.message || 'Error de inicio de sesión');
       } else {
         onSuccess();
       }
@@ -41,52 +37,21 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="flex items-center justify-center mb-4">
-  <img src="/logos/LogoRETMI.png" alt="RETMI Logo" className="w-20 h-20 object-contain" />
-</div>
+              <img src="/logos/LogoRETMI.png" alt="RETMI Logo" className="w-20 h-20 object-contain" />
+            </div>
 
-
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">RETMI</h1>
-            <p className="text-gray-600">
-              {isLogin ? 'Red de Traspaso de Medicamentos e Insumos' : 'Crea tu cuenta hospitalaria'}
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">RETMI</h1>
+            <p className="text-sm text-gray-600">
+              Red de Traspaso de Medicamentos e Insumos
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Correo Electrónico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="hospital@ejemplo.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-            </div>
+          <div className="space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+              Selecciona tu hospital para acceder
+            </p>
 
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -94,39 +59,45 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Procesando...' : (isLogin ? 'Iniciar Sesión' : 'Crear Cuenta')}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-            </button>
-          </div>
-
-          {!isLogin && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <Building2 className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900">Registro Hospitalario</p>
-                  <p className="text-xs text-blue-700 mt-1">
-                    Después del registro, podrás configurar la información de tu hospital y comenzar a intercambiar medicamentos con la red.
-                  </p>
-                </div>
+            {loading || loadingHospitals ? (
+              <div className="flex flex-col items-center justify-center py-10 space-y-3">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                <p className="text-sm text-gray-500">Cargando hospitales...</p>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="grid grid-cols-1 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                {hospitals.map((hospital) => (
+                  <button
+                    key={hospital.id}
+                    onClick={() => handleHospitalLogin(hospital.id)}
+                    className="flex items-center p-4 border border-gray-100 rounded-xl hover:border-blue-500 hover:bg-blue-50/30 text-left transition-all duration-150 group shadow-sm hover:shadow-md active:scale-[0.99]"
+                  >
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors duration-150 mr-4">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-sm truncate">
+                        {hospital.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {hospital.city}, {hospital.state}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-1.5">
+                        <span className="inline-block bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-0.5 rounded-full capitalize">
+                          {hospital.type === 'public' ? 'Público' : hospital.type === 'private' ? 'Privado' : 'Universitario'}
+                        </span>
+                        <span className="text-[10px] text-gray-400">
+                          {hospital.beds} camas
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
-};
+};

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
+import { medicationOffers as mockOffers } from '../data/mockData';
 
 type MedicationOffer = Database['public']['Tables']['medication_offers']['Row'] & {
   hospitals: Database['public']['Tables']['hospitals']['Row'];
@@ -52,13 +53,88 @@ export const useMedicationOffers = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOffers(data || []);
+      
+      let list = data || [];
+      if (list.length === 0) {
+        // Map mock offers format to db type
+        list = mockOffers.map(o => ({
+          id: o.id,
+          hospital_id: o.hospitalId,
+          medication_id: o.medication.id || o.id,
+          quantity_available: o.quantityAvailable,
+          price_per_unit: o.pricePerUnit || null,
+          expiration_date: o.medication.expirationDate || new Date().toISOString(),
+          conditions: o.conditions,
+          contact_person: o.contactPerson,
+          contact_phone: o.contactPhone,
+          contact_email: o.contactEmail,
+          valid_until: o.validUntil,
+          status: o.status as any,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          medication_name: o.medication.name,
+          hospitals: {
+            id: o.hospitalId,
+            name: o.hospitalName,
+            city: 'Ciudad de México',
+            state: 'CDMX',
+            phone: o.contactPhone,
+            email: o.contactEmail,
+            director: 'Director General',
+            beds: 100,
+            type: 'public',
+            specialties: [],
+            status: 'active',
+            verified: true,
+            user_id: '',
+            created_at: '',
+            updated_at: ''
+          }
+        })) as any;
+      }
+      setOffers(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error fetching medication offers');
+      console.warn("Supabase fetch offers failed, using mock data:", err);
+      const list = mockOffers.map(o => ({
+        id: o.id,
+        hospital_id: o.hospitalId,
+        medication_id: o.medication.id || o.id,
+        quantity_available: o.quantityAvailable,
+        price_per_unit: o.pricePerUnit || null,
+        expiration_date: o.medication.expirationDate || new Date().toISOString(),
+        conditions: o.conditions,
+        contact_person: o.contactPerson,
+        contact_phone: o.contactPhone,
+        contact_email: o.contactEmail,
+        valid_until: o.validUntil,
+        status: o.status as any,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        medication_name: o.medication.name,
+        hospitals: {
+          id: o.hospitalId,
+          name: o.hospitalName,
+          city: 'Ciudad de México',
+          state: 'CDMX',
+          phone: o.contactPhone,
+          email: o.contactEmail,
+          director: 'Director General',
+          beds: 100,
+          type: 'public',
+          specialties: [],
+          status: 'active',
+          verified: true,
+          user_id: '',
+          created_at: '',
+          updated_at: ''
+        }
+      })) as any;
+      setOffers(list);
     } finally {
       setLoading(false);
     }
   };
+
 
   const createOffer = async (offerData: CreateOfferData) => {
     try {

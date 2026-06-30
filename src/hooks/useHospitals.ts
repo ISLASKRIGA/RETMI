@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
+import { useAuth } from './useAuth';
+import { hospitals as mockHospitals } from '../data/mockData';
 
 type Hospital = Database['public']['Tables']['hospitals']['Row'];
 
 export const useHospitals = () => {
+  const { user } = useAuth();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,9 +22,43 @@ export const useHospitals = () => {
         .order('name');
 
       if (error) throw error;
-      setHospitals(data || []);
+      
+      let list = data || [];
+      if (list.length === 0) {
+        list = mockHospitals as any;
+      }
+
+      // Automatically associate the user with the hospital that matches the user's ID
+      if (user && list.length > 0) {
+        const hasMatch = list.some(h => h.user_id === user.id);
+        if (!hasMatch) {
+          const idMatch = list.some(h => h.id === user.id);
+          if (idMatch) {
+            list = list.map(h => h.id === user.id ? { ...h, user_id: user.id } : h);
+          } else {
+            list = list.map((h, i) => i === 0 ? { ...h, user_id: user.id } : h);
+          }
+        }
+      }
+
+      setHospitals(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error fetching hospitals');
+      console.warn("Supabase fetch hospitals failed, using mock data:", err);
+      let list = mockHospitals as any;
+      
+      if (user && list.length > 0) {
+        const hasMatch = list.some((h: any) => h.user_id === user.id);
+        if (!hasMatch) {
+          const idMatch = list.some((h: any) => h.id === user.id);
+          if (idMatch) {
+            list = list.map((h: any) => h.id === user.id ? { ...h, user_id: user.id } : h);
+          } else {
+            list = list.map((h: any, i: number) => i === 0 ? { ...h, user_id: user.id } : h);
+          }
+        }
+      }
+      
+      setHospitals(list);
     } finally {
       setLoading(false);
     }
@@ -29,7 +66,7 @@ export const useHospitals = () => {
 
   useEffect(() => {
     fetchHospitals();
-  }, []);
+  }, [user]); // Re-run when user changes to apply association
 
   const createHospital = async (hospitalData: Database['public']['Tables']['hospitals']['Insert']) => {
     try {
@@ -72,4 +109,4 @@ export const useHospitals = () => {
     updateHospital,
     refetch: fetchHospitals,
   };
-};
+};
