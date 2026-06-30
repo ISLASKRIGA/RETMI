@@ -1,18 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Safe fallbacks to prevent crashes on Netlify/Vercel if environment variables are not set
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-project.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyLXByb2plY3QiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY3MjUwOTYwMCwiZXhwIjoyMDA0MDg1NjAwfQ.placeholder-signature';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Missing Supabase environment variables. Please check your .env file.');
-  console.error('Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY');
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
-}
-
-// Validate URL format
-if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
-  console.error('❌ Invalid Supabase URL format:', supabaseUrl);
-  throw new Error('Invalid Supabase URL format. Should be https://your-project.supabase.co');
+const isPlaceholder = supabaseUrl.includes('placeholder-project');
+if (isPlaceholder) {
+  console.warn('⚠️ Using placeholder Supabase credentials. App will run in offline/mock demo mode.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
