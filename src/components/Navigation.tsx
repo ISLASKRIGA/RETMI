@@ -26,12 +26,12 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
     { id: 'hospitales', label: 'Hospitales', icon: Building2 },
     { id: 'solicitudes', label: 'Solicitudes', icon: Search },
     { id: 'insumos-disponibles', label: 'Insumos Disponibles', icon: Plus },
-    { id: 'transferencias', label: 'Transferencias', icon: ArrowRightLeft }, // se mantiene para navegación interna
+    { id: 'transferencias', label: 'Red de Traspasos', icon: ArrowRightLeft },
     { id: 'mensajes', label: 'Mensajes', icon: MessageCircle }
   ];
 
-  // 👇 Ocultamos 'transferencias' solo en el menú
-  const menuTabs = tabs.filter(tab => tab.id !== 'transferencias');
+  // Mostramos todas las pestañas incluyendo Red de Traspasos
+  const menuTabs = tabs;
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);

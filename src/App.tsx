@@ -12,6 +12,7 @@ import { Dashboard } from './components/Dashboard';
 import { MedicationRequests } from './components/MedicationRequests';
 import { MedicationOffers } from './components/MedicationOffers';
 import { HospitalNetwork } from './components/HospitalNetwork';
+import { TransferNetwork } from './components/TransferNetwork';
 import { Messages } from './components/Messages';
 import MessageListener from './components/MessageListener';
 import { initNewMessageSound, unlockNewMessageSound } from './utils/newMessageAlert';
@@ -145,14 +146,7 @@ useEffect(() => {
       case 'insumos-disponibles':
         return <MedicationOffers onNavigate={goTo} />;
       case 'transferencias':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Transferencias</h2>
-            <p className="text-gray-600">
-              Las transferencias se gestionan a través del sistema de mensajería cuando ambos hospitales están de acuerdo
-            </p>
-          </div>
-        );
+        return <TransferNetwork onNavigate={goTo} />;
       case 'mensajes':
         return <Messages />;
       default:
