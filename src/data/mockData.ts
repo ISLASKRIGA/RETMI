@@ -3,7 +3,7 @@ import { Hospital, MedicationRequest, MedicationOffer } from '../types';
 export const hospitals: Hospital[] = [
   {
     id: '1',
-    name: 'Instituto Nacional de Perinatología (INPer)',
+    name: 'Instituto Nacional de Perinatología Isidro Espinosa de los Reyes (INPer)',
     address: 'Montes Urales 800, Lomas de Virreyes',
     city: 'Ciudad de México',
     state: 'CDMX',
@@ -52,7 +52,7 @@ export const medicationRequests: MedicationRequest[] = [
   {
     id: '1',
     hospitalId: '1',
-    hospitalName: 'Instituto Nacional de Perinatología (INPer)',
+    hospitalName: 'Instituto Nacional de Perinatología Isidro Espinosa de los Reyes (INPer)',
     medication: {
       name: 'Amoxicilina',
       genericName: 'Amoxicilina',
@@ -137,7 +137,7 @@ export const medicationOffers: MedicationOffer[] = [
   {
     id: '2',
     hospitalId: '1',
-    hospitalName: 'Instituto Nacional de Perinatología (INPer)',
+    hospitalName: 'Instituto Nacional de Perinatología Isidro Espinosa de los Reyes (INPer)',
     medication: {
       id: '2',
       name: 'Insulina Glargina',

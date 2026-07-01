@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
-import { medicationOffers as mockOffers } from '../data/mockData';
+import { medicationOffers as mockOffers, hospitals as mockHospitals } from '../data/mockData';
 
 type MedicationOffer = Database['public']['Tables']['medication_offers']['Row'] & {
   hospitals: Database['public']['Tables']['hospitals']['Row'];
@@ -46,7 +46,8 @@ export const useMedicationOffers = () => {
             city,
             state,
             phone,
-            email
+            email,
+            director
           )
         `)
         .eq('status', 'available')
@@ -80,7 +81,7 @@ export const useMedicationOffers = () => {
             state: 'CDMX',
             phone: o.contactPhone,
             email: o.contactEmail,
-            director: 'Director General',
+            director: mockHospitals.find(h => h.id === o.hospitalId)?.director || 'Director General',
             beds: 100,
             type: 'public',
             specialties: [],
@@ -118,7 +119,7 @@ export const useMedicationOffers = () => {
           state: 'CDMX',
           phone: o.contactPhone,
           email: o.contactEmail,
-          director: 'Director General',
+          director: mockHospitals.find(h => h.id === o.hospitalId)?.director || 'Director General',
           beds: 100,
           type: 'public',
           specialties: [],

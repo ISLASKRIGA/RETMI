@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNotifications } from './useNotifications'; // 👈 asegúrate de que la ruta sea correcta
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
-import { medicationRequests as mockRequests } from '../data/mockData';
+import { medicationRequests as mockRequests, hospitals as mockHospitals } from '../data/mockData';
 
 type MedicationRequest = Database['public']['Tables']['medication_requests']['Row'] & {
   hospitals: Database['public']['Tables']['hospitals']['Row'];
@@ -27,7 +27,8 @@ export const useMedicationRequests = () => {
             city,
             state,
             phone,
-            email
+            email,
+            director
           )
         `)
         .eq('status', 'pending')
@@ -59,7 +60,7 @@ export const useMedicationRequests = () => {
             state: 'CDMX',
             phone: r.contactPhone,
             email: r.contactEmail,
-            director: 'Director General',
+            director: mockHospitals.find(h => h.id === r.hospitalId)?.director || 'Director General',
             beds: 100,
             type: 'public',
             specialties: [],
@@ -95,7 +96,7 @@ export const useMedicationRequests = () => {
           state: 'CDMX',
           phone: r.contactPhone,
           email: r.contactEmail,
-          director: 'Director General',
+          director: mockHospitals.find(h => h.id === r.hospitalId)?.director || 'Director General',
           beds: 100,
           type: 'public',
           specialties: [],

@@ -51,7 +51,7 @@ export const TransferNetwork: React.FC<TransferNetworkProps> = ({ onNavigate }) 
       id: 'tr-1',
       medicationName: 'Amoxicilina 500mg',
       sourceHospital: 'Hospital de la Mujer',
-      destHospital: 'Instituto Nacional de Perinatología (INPer)',
+      destHospital: 'Instituto Nacional de Perinatología Isidro Espinosa de los Reyes (INPer)',
       quantity: 350,
       date: '2026-06-28',
       status: 'completed',
@@ -62,7 +62,7 @@ export const TransferNetwork: React.FC<TransferNetworkProps> = ({ onNavigate }) 
     {
       id: 'tr-2',
       medicationName: 'Insulina Glargina 100 UI/ml',
-      sourceHospital: 'Instituto Nacional de Perinatología (INPer)',
+      sourceHospital: 'Instituto Nacional de Perinatología Isidro Espinosa de los Reyes (INPer)',
       destHospital: 'Hospital General de México',
       quantity: 15,
       date: '2026-06-30',
